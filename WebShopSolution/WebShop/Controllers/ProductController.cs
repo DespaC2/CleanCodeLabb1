@@ -7,28 +7,25 @@ namespace WebShop.Controllers
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
     {
-        public ProductController()
+        private readonly IUnitOfWork _unitOfWork;
+
+        public ProductController(IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
         }
 
-        // Endpoint för att hämta alla produkter
         [HttpGet]
         public ActionResult<IEnumerable<Product>> GetProducts()
         {
-            // Behöver använda repository via Unit of Work för att hämta produkter
-            return Ok();
+            var products = _unitOfWork.Products.GetAll();
+            return Ok(products);
         }
 
-        // Endpoint för att lägga till en ny produkt
         [HttpPost]
         public ActionResult AddProduct(Product product)
         {
-            // Lägger till produkten via repository
-
-            // Sparar förändringar
-
-            // Notifierar observatörer om att en ny produkt har lagts till
-
+            _unitOfWork.Products.Add(product);
+            _unitOfWork.NotifyProductAdded(product);
             return Ok();
         }
     }

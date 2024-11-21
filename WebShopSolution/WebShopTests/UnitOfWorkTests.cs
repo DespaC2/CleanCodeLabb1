@@ -1,5 +1,7 @@
 using Moq;
 using WebShop.Notifications;
+using WebShop.Repositories;
+using WebShop.UnitOfWork;
 
 namespace WebShop.Tests
 {
@@ -9,23 +11,20 @@ namespace WebShop.Tests
         public void NotifyProductAdded_CallsObserverUpdate()
         {
             // Arrange
-            var product = new Product { Id = 1, Name = "Test" };
-
-            // Skapar en mock av INotificationObserver
+            var product = new Product { Id = 1, Name = "TestProduct" };
             var mockObserver = new Mock<INotificationObserver>();
 
-            // Skapar en instans av ProductSubject och lägger till mock-observatören
             var productSubject = new ProductSubject();
             productSubject.Attach(mockObserver.Object);
 
-            // Injicerar vårt eget ProductSubject i UnitOfWork
-            var unitOfWork = new UnitOfWork.UnitOfWork(productSubject);
+            var mockProductRepository = new Mock<IProductRepository>();
+            var unitOfWork = new WebShop.UnitOfWork.UnitOfWork(mockProductRepository.Object, productSubject);
+
 
             // Act
             unitOfWork.NotifyProductAdded(product);
 
             // Assert
-            // Verifierar att Update-metoden kallades på vår mock-observatör
             mockObserver.Verify(o => o.Update(product), Times.Once);
         }
     }

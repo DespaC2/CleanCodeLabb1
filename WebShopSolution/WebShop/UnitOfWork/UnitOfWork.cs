@@ -5,20 +5,15 @@ namespace WebShop.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {
-        // Hämta produkter från repository
         public IProductRepository Products { get; private set; }
-
         private readonly ProductSubject _productSubject;
 
-        // Konstruktor används för tillfället av Observer pattern
-        public UnitOfWork(ProductSubject productSubject = null)
+        public UnitOfWork(IProductRepository productRepository, ProductSubject productSubject = null)
         {
-            Products = null;
-
-            // Om inget ProductSubject injiceras, skapa ett nytt
+            Products = productRepository;
             _productSubject = productSubject ?? new ProductSubject();
 
-            // Registrera standardobservatörer
+            // Lägg till standard-observatörer
             _productSubject.Attach(new EmailNotification());
         }
 

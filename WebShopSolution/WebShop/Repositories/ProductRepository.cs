@@ -1,17 +1,45 @@
-﻿namespace WebShop.Repositories
+﻿using WebShop.Data;
+using Microsoft.EntityFrameworkCore;
+
+
+namespace WebShop.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        private readonly List<Product> _products = new List<Product>();
+        private readonly ProductDbContext _context;
 
-        public IEnumerable<Product> GetAll()
+        public ProductRepository(ProductDbContext context)
         {
-            return _products;
+            _context = context;
         }
 
-        public void Add(Product product)
+        public async Task<IEnumerable<Product>> GetAllAsync()
         {
-            _products.Add(product);
+            return await _context.Products.ToListAsync();
+        }
+
+        public async Task<Product> GetByIdAsync(int id)
+        {
+            return await _context.Products.FindAsync(id);
+        }
+
+        public async Task AddAsync(Product product)
+        {
+            await _context.Products.AddAsync(product);
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var product = await GetByIdAsync(id);
+            if (product != null)
+            {
+                _context.Products.Remove(product);
+            }
+        }
+
+        public async Task UpdateAsync(Product product)
+        {
+            _context.Products.Update(product);
         }
     }
 }

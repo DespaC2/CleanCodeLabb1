@@ -15,18 +15,51 @@ namespace WebShop.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Product>> GetProducts()
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            var products = _unitOfWork.Products.GetAll();
+            var products = await _unitOfWork.Products.GetAllAsync();
             return Ok(products);
         }
 
-        [HttpPost]
-        public ActionResult AddProduct(Product product)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            _unitOfWork.Products.Add(product);
-            _unitOfWork.NotifyProductAdded(product);
-            return Ok();
+            var product = await _unitOfWork.Products.GetByIdAsync(id);
+            if (product == null)
+                return NotFound();
+
+            return Ok(product);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddProduct([FromBody] Product product)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await _unitOfWork.Products.AddAsync(product);
+            await _unitOfWork.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product product)
+        {
+            if (id != product.Id || !ModelState.IsValid)
+                return BadRequest();
+
+            await _unitOfWork.Products.UpdateAsync(product);
+            await _unitOfWork.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            await _unitOfWork.Products.DeleteAsync(id);
+            await _unitOfWork.SaveChangesAsync();
+            return NoContent();
         }
     }
+
 }

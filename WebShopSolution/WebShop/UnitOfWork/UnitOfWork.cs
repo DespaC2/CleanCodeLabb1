@@ -1,25 +1,41 @@
-﻿using WebShop.Notifications;
+﻿using WebShop.Data;
+using WebShop.Interfaces;
+using WebShop.Notifications;
 using WebShop.Repositories;
 
 namespace WebShop.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {
-        public IProductRepository Products { get; private set; }
+        private readonly IProductDbContext _context;
         private readonly ProductSubject _productSubject;
 
-        public UnitOfWork(IProductRepository productRepository, ProductSubject productSubject = null)
-        {
-            Products = productRepository;
-            _productSubject = productSubject ?? new ProductSubject();
+        public IProductRepository Products { get; }
 
-            // Lägg till standard-observatörer
-            _productSubject.Attach(new EmailNotification());
+        public UnitOfWork(IProductDbContext context, IProductRepository productRepository, ProductSubject productSubject)
+        {
+            _context = context;
+            Products = productRepository;
+            _productSubject = productSubject;
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
 
         public void NotifyProductAdded(Product product)
         {
             _productSubject.Notify(product);
         }
+
+        public void Dispose()
+        {
+            
+        }
     }
+
+
+
+
 }

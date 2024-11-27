@@ -2,9 +2,9 @@
 
 namespace WebShop.UnitOfWork
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IDisposable
     {
         IProductRepository Products { get; }
-        void NotifyProductAdded(Product product);
+        Task SaveChangesAsync(); 
     }
 }

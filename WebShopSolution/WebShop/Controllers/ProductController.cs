@@ -8,10 +8,12 @@ namespace WebShop.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ProductNotifier _notifier;
 
-        public ProductController(IUnitOfWork unitOfWork)
+        public ProductController(IUnitOfWork unitOfWork, ProductNotifier notifier)
         {
             _unitOfWork = unitOfWork;
+            _notifier = notifier;
         }
 
         [HttpGet]
@@ -39,6 +41,9 @@ namespace WebShop.Controllers
 
             await _unitOfWork.Products.AddAsync(product);
             await _unitOfWork.SaveChangesAsync();
+
+            _notifier.Notify(product);
+
             return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
 

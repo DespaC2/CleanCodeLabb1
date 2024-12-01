@@ -19,11 +19,13 @@ public class ProductControllerTests
     {
         _mockProductRepository = new Mock<IProductRepository>();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
+        var notifier = new ProductNotifier(); 
 
         _mockUnitOfWork.Setup(uow => uow.Products).Returns(_mockProductRepository.Object);
 
-        _controller = new ProductController(_mockUnitOfWork.Object);
+        _controller = new ProductController(_mockUnitOfWork.Object, notifier);
     }
+
 
     [Fact]
     public async Task GetProducts_ReturnsOkWithProducts()

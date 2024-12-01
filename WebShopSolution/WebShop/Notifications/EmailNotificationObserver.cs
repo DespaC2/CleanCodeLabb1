@@ -1,7 +1,7 @@
 ﻿namespace WebShop.Notifications
 {
     // En konkret observatör som skickar e-postmeddelanden
-    public class EmailNotification : INotificationObserver
+    public class EmailNotificationObserver : INotificationObserver
     {
         public void Update(Product product)
         {
